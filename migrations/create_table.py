@@ -12,7 +12,7 @@ def create_tables():
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
     # create table one by one
-    print("HIII")
+
     for command in commands:
       print(command)
       cur.execute(command)

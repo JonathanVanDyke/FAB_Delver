@@ -25,17 +25,22 @@ class FabCardController:
     return results
 
   def create_record(self, rec):
+
     params = config()
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
     q = '''INSERT INTO fab_scraped_cards (card_name, rarity, num, price, source_url) VALUES (%s,%s,%s,%s,%s)'''
 
-    cur.execute(q, rec)
+    res = cur.execute(q, rec)
+    
     conn.commit()
-    # self.list_all()
+    
+    
+
     cur.close()
     conn.close()
     # return results
+
     return
 
   def delete_record_by_id(self, id):
@@ -73,7 +78,7 @@ class FabCardController:
 fb_controller = FabCardController()
 # fb_controller.list_all()
 record = ('test', 'test', 'test', 'test', '-',)
-# fb_controller.create_record(record)
+fb_controller.create_record(record)
 
 # fb_controller.delete_record_by_card_name('test')
 # fb_controller.delete_record_by_id(32)
