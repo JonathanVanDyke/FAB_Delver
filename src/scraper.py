@@ -44,6 +44,12 @@ class WebTableTest:
       for c in range(1, num_cols):
         final_xpath = pre_xpath + str(r) + after_td_xpath + str(c) + after_tr_xpath
         cell_text = driver.find_element_by_xpath(final_xpath).text
+        
+        if "//" in cell_text:
+          cell_text = cell_text.split("//")
+          cell_text = cell_text[0][:-1]
+          # print(cell_text, len(cell_text))
+
         res[-1].append(cell_text)
 
         if len(res[-1]) >= 5:

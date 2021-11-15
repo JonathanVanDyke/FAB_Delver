@@ -25,7 +25,8 @@ class FabCardController:
     return results
 
   def create_record(self, rec):
-
+    if self.get_card_by_name(rec[0]):
+      return
     params = config()
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
