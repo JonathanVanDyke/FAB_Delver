@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import requests
 import json
 import urllib.request
-# from ..controllers import controller
 from controllers.controller import FabCardController
 from PIL import Image
 
@@ -12,25 +11,32 @@ class Reader:
   def __init__(self):
     self.img = None
     self.text = None
-    #self.fb = FabCardController()
+    self.card_name = None
+    self.fb = FabCardController()
 
-  def read_image(self, src = 'MON002.png'):
+  def process_image(self):
+    self.read_image(r'src/MON002.png')
+    self.get_card_card_name()
+    print(self.card_name)
+    self.get_card_from_db(self.card_name)
+
+  def read_image(self, src):
     self.img = cv2.imread(src)
 
     cv2.imshow('prism', self.img)
 
     # cv2.waitKey(0)
     img_text = pytesseract.image_to_string(self.img);
-    self.text = img_text
+    self.card_name = img_text
     return img_text
 
-  def get_card_title(self):
-    print(self.text.split("\n")[0])
-    return self.text.split("\n")[0]
+  def get_card_card_name(self):
+    self.card_name = self.card_name.split("\n")[0]
+    return self.card_name
 
   def log_text(self):
-    if (self.text):
-      print(self.text)
+    if (self.card_name):
+      print(self.card_name)
     else:
       print('No text has been read.')
 
@@ -57,7 +63,6 @@ class Reader:
     for match in matches:
       if match['name'].lower() == key_term:
         return match
-      
 
   def show_img_url(self, url):
     urllib.request.urlretrieve(
@@ -72,25 +77,23 @@ class Reader:
     stud_obj = json.loads(response.text)
     matches = stud_obj['data']
   
-    for match in matches:
+    for i, match in enumerate(matches):
+      if i > 0: break
+      print(i)
       # print(match['name'])
       self.clean_data(match)
 
-  def clean_data(self, data):
-    print(data)
-
-
-  def load_card(self, record):
-    self.fb.create_record(record)
-
-  def show_db(self):
-    self.fb.list_all()
-   
+  def get_card_from_db(self, name):
+    result = self.fb.get_card_by_name(name)
+    print(result)
+    return result
+    
 
 rd = Reader()
 # rd.read_image('MON002.png')
 # rd.get_card_title()
 # rd.search_card_api()
 print('********************************')
+rd.process_image()
 # rd.get_all_cards()
 
