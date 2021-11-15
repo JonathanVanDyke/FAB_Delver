@@ -1,6 +1,6 @@
 
 import psycopg2
-from ..config import config
+import config
 
 class FabCardController:
   def __init__(self):
@@ -74,13 +74,12 @@ class FabCardController:
 
   
 
-# list_all()
-fb_controller = FabCardController()
-# fb_controller.list_all()
-record = ('test', 'test', 'test', 'test', '-',)
-fb_controller.create_record(record)
+# # list_all()
+# fb_controller = FabCardController()
+# # fb_controller.list_all()
+# record = ('test', 'test', 'test', 'test', '-',)
+# fb_controller.create_record(record)
 
-# fb_controller.delete_record_by_card_name('test')
-# fb_controller.delete_record_by_id(32)
-fb_controller.list_all()
-test = "hi"
+# # fb_controller.delete_record_by_card_name('test')
+# # fb_controller.delete_record_by_id(32)
+# fb_controller.list_all()

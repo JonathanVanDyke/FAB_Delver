@@ -5,14 +5,14 @@ import requests
 import json
 import urllib.request
 # from ..controllers import controller
-from ..controllers.controller import FabCardController
+from controllers.controller import FabCardController
 from PIL import Image
 
 class Reader:
   def __init__(self):
     self.img = None
     self.text = None
-    self.fb = FabCardController()
+    #self.fb = FabCardController()
 
   def read_image(self, src = 'MON002.png'):
     self.img = cv2.imread(src)
@@ -71,8 +71,14 @@ class Reader:
     response = requests.get("http://api.fabdb.net/cards/", params=query)
     stud_obj = json.loads(response.text)
     matches = stud_obj['data']
+  
     for match in matches:
-      print(match['name'])
+      # print(match['name'])
+      self.clean_data(match)
+
+  def clean_data(self, data):
+    print(data)
+
 
   def load_card(self, record):
     self.fb.create_record(record)
@@ -82,9 +88,9 @@ class Reader:
    
 
 rd = Reader()
-rd.read_image('MON002.png')
-rd.get_card_title()
-rd.search_card_api()
+# rd.read_image('MON002.png')
+# rd.get_card_title()
+# rd.search_card_api()
 print('********************************')
-rd.get_all_cards()
+# rd.get_all_cards()
 

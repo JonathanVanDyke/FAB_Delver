@@ -1,5 +1,5 @@
 import psycopg2
-from config import config
+import config
 
 def create_tables():
   """ create tables in the PostgreSQL database"""
