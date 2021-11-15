@@ -6,6 +6,7 @@ import json
 import urllib.request
 from controllers.controller import FabCardController
 from PIL import Image
+from camera import run_camera
 
 class Reader:
   def __init__(self):
@@ -15,18 +16,34 @@ class Reader:
     self.fb = FabCardController()
 
   def process_image(self):
-    self.read_image(r'src/MON002.png')
+    img = run_camera()
+    self.read_image_from_cam(img)
+
+    # self.read_image_from_src(r'src/MON002.png')
+
     self.get_card_card_name()
     print(self.card_name)
     self.get_card_from_db(self.card_name)
 
-  def read_image(self, src):
+  def read_image_from_cam(self, img):
+    self.img = img
+
+    cv2.imshow('prism', self.img)
+
+    # cv2.waitKey(0)
+    img_text = pytesseract.image_to_string(self.img)
+    print(img_text)
+    self.card_name = img_text
+    return img_text
+
+  def read_image_from_src(self, src):
     self.img = cv2.imread(src)
 
     cv2.imshow('prism', self.img)
 
     # cv2.waitKey(0)
     img_text = pytesseract.image_to_string(self.img);
+    print(img_text)
     self.card_name = img_text
     return img_text
 
