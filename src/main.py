@@ -16,6 +16,7 @@ class Reader:
     self.fb = FabCardController()
 
   def process_image(self):
+    # TODO: CONSIDER storing all card_names in cache and matching on them
     img = run_camera()
     self.read_image_from_cam(img)
 
@@ -25,14 +26,38 @@ class Reader:
     print(self.card_name)
     self.get_card_from_db(self.card_name)
 
+  def clean_image(self):
+    gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+
+    blur = cv2.GaussianBlur(gray, (3, 3), 0)
+    thresh = cv2.threshold(
+        blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
+    # Morph open to remove noise and invert image
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+    invert = 255 - opening
+
+    cv2.imshow('thresh', thresh)
+    cv2.waitKey()
+
+    cv2.imshow('opening', opening)
+    cv2.waitKey()
+    cv2.imshow('invert', invert)
+    cv2.waitKey()
+    self.img = kernel
+
   def read_image_from_cam(self, img):
     self.img = img
 
-    cv2.imshow('prism', self.img)
+    # self.clean_image()
+
+    # cv2.imshow('prism', self.img)
 
     # cv2.waitKey(0)
-    img_text = pytesseract.image_to_string(self.img)
-    print(img_text)
+    img_text = pytesseract.image_to_string(
+        self.img, lang='eng', config='--psm 3')
+    print('The following text was found: ', img_text)
     self.card_name = img_text
     return img_text
 
@@ -43,7 +68,7 @@ class Reader:
 
     # cv2.waitKey(0)
     img_text = pytesseract.image_to_string(self.img);
-    print(img_text)
+    # print(img_text)
     self.card_name = img_text
     return img_text
 
