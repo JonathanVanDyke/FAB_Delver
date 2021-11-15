@@ -1,6 +1,6 @@
 
 import psycopg2
-from config import config
+from ..config import config
 
 class FabCardController:
   def __init__(self):
@@ -40,7 +40,7 @@ class FabCardController:
     cur.close()
     conn.close()
     # return results
-
+    # TODO: look into UPSERT for postgresql, ON CONFLICT UPDATE
     return
 
   def delete_record_by_id(self, id):
@@ -83,3 +83,4 @@ fb_controller.create_record(record)
 # fb_controller.delete_record_by_card_name('test')
 # fb_controller.delete_record_by_id(32)
 fb_controller.list_all()
+test = "hi"

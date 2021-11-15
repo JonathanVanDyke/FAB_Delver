@@ -4,12 +4,15 @@ import matplotlib.pyplot as plt
 import requests
 import json
 import urllib.request
+# from ..controllers import controller
+from ..controllers.controller import FabCardController
 from PIL import Image
 
 class Reader:
   def __init__(self):
     self.img = None
     self.text = None
+    self.fb = FabCardController()
 
   def read_image(self, src = 'MON002.png'):
     self.img = cv2.imread(src)
@@ -58,10 +61,8 @@ class Reader:
 
   def show_img_url(self, url):
     urllib.request.urlretrieve(
-        url,
-        "img.png")
-
-
+      url,
+      "img.png")
     img = Image.open("img.png")
     img.show()
 
@@ -72,13 +73,17 @@ class Reader:
     matches = stud_obj['data']
     for match in matches:
       print(match['name'])
+
+  def load_card(self, record):
+    self.fb.create_record(record)
+
+  def show_db(self):
+    self.fb.list_all()
    
 
 rd = Reader()
 rd.read_image('MON002.png')
-# rd.log_text()
 rd.get_card_title()
-# rd.log_text()
 rd.search_card_api()
 print('********************************')
 rd.get_all_cards()
