@@ -1,3 +1,4 @@
+import threading
 import pytesseract
 import cv2
 import matplotlib.pyplot as plt
@@ -15,9 +16,13 @@ class Reader:
     self.card_name = None
     self.fb = FabCardController()
 
+  def run(self):
+    self.process_image()     
+
   def process_image(self):
     # TODO: CONSIDER storing all card_names in cache and matching on them
     img = run_camera()
+    
     self.read_image_from_cam(img)
 
     # self.read_image_from_src(r'src/MON002.png')
@@ -25,6 +30,11 @@ class Reader:
     self.get_card_card_name()
     print(self.card_name)
     self.get_card_from_db(self.card_name)
+
+  def run_local_cam(self):
+    cam = cv2.VideoCapture(0)
+    ret, self.img = cam.read()
+    cv2.imshow("test", self.img)
 
   def clean_image(self):
     gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -49,7 +59,6 @@ class Reader:
 
   def read_image_from_cam(self, img):
     self.img = img
-
     # self.clean_image()
 
     # cv2.imshow('prism', self.img)
@@ -57,6 +66,16 @@ class Reader:
     # cv2.waitKey(0)
     img_text = pytesseract.image_to_string(
         self.img, lang='eng', config='--psm 3')
+
+    img_boxes = pytesseract.image_to_boxes(self.img)
+
+    img_h, img_w, _ = self.img.shape
+
+    for boxes in img_boxes.splitlines():
+      boxes = boxes.split(' ')
+      x, y, w, h = int(boxes[1]), int(boxes[2]), int(boxes[3]), int(boxes[4])
+      cv2.rectangle(self.img, (x, img_h-y), (w, img_w-h) , (0,0,255),3)
+
     print('The following text was found: ', img_text)
     self.card_name = img_text
     return img_text
@@ -68,6 +87,7 @@ class Reader:
 
     # cv2.waitKey(0)
     img_text = pytesseract.image_to_string(self.img);
+
     # print(img_text)
     self.card_name = img_text
     return img_text
@@ -129,13 +149,54 @@ class Reader:
     result = self.fb.get_card_by_name(name)
     print(result)
     return result
+
+  def example(self):
+    font_scale = 1.5
+    font = cv2.FONT_HERSHEY_PLAIN
+
+    cap = cv2.VideoCapture(1)
+
+    if not cap.isOpened():
+      cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+      raise IOError("Cannot open video")
     
+    counter = 0
+    while True:
+      ret, img = cap.read()
+      counter += 1
+      if ((counter % 5) == 0):
+        img_h, img_w, _ = img.shape
+        x1, y1, w1, h1 = 0, 0, img_h, img_w
+
+        img_text = pytesseract.image_to_string(img)
+
+
+        img_boxes = pytesseract.image_to_boxes(img)
+        for boxes in img_boxes.splitlines():
+          boxes = boxes.split(' ')
+          x, y, w, h = int(boxes[1]), int(
+              boxes[2]), int(boxes[3]), int(boxes[4])
+          cv2.rectangle(img, (x, img_h-y), (w, img_h-h), (0, 0, 255), 3)
+
+        cv2.putText(img, img_text, ( x1 + int(w1/50), y1 + int(h1/50) ) , cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,0,0), 2)
+    
+        font = cv2.FONT_HERSHEY_SIMPLEX
+
+        cv2.imshow('Detect', img)
+
+        if cv2.waitKey(2) & 0xFF == ord('q'):
+          break
 
 rd = Reader()
 # rd.read_image('MON002.png')
 # rd.get_card_title()
 # rd.search_card_api()
 print('********************************')
-rd.process_image()
+# rd.process_image()
+
+rd.example()
+
+
 # rd.get_all_cards()
 
